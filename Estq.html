@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de estoque</title>
+  <link rel="stylesheet" href="Estq.css">
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">ORGANIZAÇÃO E CONTROLE</p>
+        <h1>Controle de estoque</h1>
+        <p class="subtitle">Acompanhe as entradas, retiradas e o saldo dos seus produtos.</p>
+      </div>
+    </header>
+
+    <section class="summary" aria-label="Resumo do estoque">
+      <article class="summary-card">
+        <span class="summary-label">Produtos cadastrados</span>
+        <strong id="product-count">0</strong>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Unidades em estoque</span>
+        <strong id="unit-count">0</strong>
+      </article>
+      <article class="summary-card">
+        <span class="summary-label">Movimentações</span>
+        <strong id="movement-count">0</strong>
+      </article>
+    </section>
+
+    <section class="panel form-panel">
+      <div class="section-heading">
+        <div>
+          <h2>Nova movimentação</h2>
+          <p>Informe os dados da entrada ou retirada.</p>
+        </div>
+      </div>
+      <form id="movement-form">
+        <label>
+          Data
+          <input id="date" name="date" type="date" required>
+        </label>
+        <label class="product-field">
+          Nome do produto
+          <select id="product" name="product" required>
+            <option value="">Selecione um produto</option>
+          </select>
+        </label>
+        <label>
+          Tipo
+          <select id="type" name="type" required>
+            <option value="entrada">Entrada</option>
+            <option value="retirada">Retirada</option>
+          </select>
+        </label>
+        <label>
+          Quantidade
+          <input id="quantity" name="quantity" type="number" min="1" step="1" placeholder="0" required>
+        </label>
+        <button type="submit">Registrar movimentação</button>
+      </form>
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <h2>Saldo por produto</h2>
+          <p>Quantidade disponível no estoque.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th class="number-cell">Saldo atual</th>
+            </tr>
+          </thead>
+          <tbody id="stock-list"></tbody>
+        </table>
+        <p id="empty-stock" class="empty-state">Nenhum produto no estoque ainda.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <h2>Histórico de movimentações</h2>
+          <p>Entradas e retiradas registradas.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Produto</th>
+              <th>Tipo</th>
+              <th class="number-cell">Quantidade</th>
+            </tr>
+          </thead>
+          <tbody id="history-list"></tbody>
+        </table>
+        <p id="empty-history" class="empty-state">Nenhuma movimentação registrada.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const form = document.querySelector("#movement-form");
+    const dateInput = document.querySelector("#date");
+    const productInput = document.querySelector("#product");
+    const typeInput = document.querySelector("#type");
+    const quantityInput = document.querySelector("#quantity");
+    const message = document.querySelector("#message");
+
+    let products = [];
+    let movements = [];
+
+    function setToday() {
+      const today = new Date();
+      dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    }
+
+    setToday();
+
+    async function loadState() {
+      const response = await fetch("/api/state");
+      const state = await response.json();
+      if (!response.ok) {
+        throw new Error(state.error || "Não foi possível carregar os dados do estoque.");
+      }
+      products = state.products;
+      movements = state.movements;
+      const selectedValue = productInput.value;
+      productInput.replaceChildren(new Option("Selecione um produto", ""));
+      for (const product of products) {
+        productInput.add(new Option(product.name, product.name));
+      }
+      productInput.value = selectedValue;
+      render();
+    }
+
+    function addCell(row, text, className) {
+      const cell = document.createElement("td");
+      cell.textContent = text;
+      if (className) cell.className = className;
+      row.append(cell);
+    }
+
+    function render() {
+      const stockList = document.querySelector("#stock-list");
+      const historyList = document.querySelector("#history-list");
+      stockList.replaceChildren();
+      historyList.replaceChildren();
+
+      for (const product of products) {
+        const row = document.createElement("tr");
+        addCell(row, product.name);
+        addCell(row, String(product.quantity), "number-cell stock-quantity");
+        stockList.append(row);
+      }
+
+      movements.forEach(movement => {
+        const row = document.createElement("tr");
+        addCell(row, new Date(`${movement.date}T00:00:00`).toLocaleDateString("pt-BR"));
+        addCell(row, movement.product);
+        const typeCell = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = `badge ${movement.type}`;
+        badge.textContent = movement.type === "entrada" ? "Entrada" : "Retirada";
+        typeCell.append(badge);
+        row.append(typeCell);
+        addCell(row, String(movement.quantity), "number-cell");
+        historyList.append(row);
+      });
+
+      document.querySelector("#product-count").textContent = String(products.length);
+      document.querySelector("#unit-count").textContent =
+        String(products.reduce((total, product) => total + product.quantity, 0));
+      document.querySelector("#movement-count").textContent = String(movements.length);
+      document.querySelector("#empty-stock").hidden = products.length > 0;
+      document.querySelector("#empty-history").hidden = movements.length > 0;
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const product = productInput.value.trim();
+      const quantity = Number(quantityInput.value);
+      const type = typeInput.value;
+
+      try {
+        const response = await fetch("/api/movements", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date: dateInput.value, product, type, quantity })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || "Não foi possível registrar a movimentação.");
+        }
+        form.reset();
+        setToday();
+        await loadState();
+        message.textContent = result.message;
+        message.className = "message success";
+      } catch (error) {
+        message.textContent = error.message || "Não foi possível conectar ao banco de dados.";
+        message.className = "message error";
+      }
+    });
+
+    loadState().catch(error => {
+      message.textContent = `${error.message} Inicie o servidor executando: python Estq.py`;
+      message.className = "message error";
+      form.querySelector("button").disabled = true;
+    });
+  </script>
+</body>
+</html>

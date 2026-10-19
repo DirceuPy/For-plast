@@ -1,0 +1,300 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #18231f;
+  background: #f4f7f5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 10% 0, rgba(42, 139, 95, 0.09), transparent 34rem),
+    #f4f7f5;
+}
+
+.container {
+  width: min(1040px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 9px;
+  color: #278354;
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 8px;
+  font-size: clamp(2rem, 5vw, 2.65rem);
+  letter-spacing: -0.045em;
+}
+
+.subtitle,
+.section-heading p {
+  margin-bottom: 0;
+  color: #718078;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.summary-card,
+.panel {
+  border: 1px solid #e2eae5;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 5px 20px rgba(30, 57, 43, 0.035);
+}
+
+.summary-card {
+  padding: 20px 22px;
+}
+
+.summary-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #718078;
+  font-size: 0.88rem;
+}
+
+.summary-card strong {
+  font-size: 1.8rem;
+  letter-spacing: -0.04em;
+}
+
+.panel {
+  margin-bottom: 18px;
+  padding: 24px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-heading h2 {
+  margin-bottom: 5px;
+  font-size: 1.15rem;
+}
+
+.section-heading p {
+  font-size: 0.9rem;
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 0.8fr auto;
+  align-items: end;
+  gap: 13px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: #46544c;
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+input,
+select,
+button {
+  min-height: 44px;
+  border-radius: 8px;
+  font: inherit;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid #dce5df;
+  outline: none;
+  padding: 0 11px;
+  color: #24322a;
+  background: #fff;
+}
+
+input:focus,
+select:focus {
+  border-color: #3a9b69;
+  box-shadow: 0 0 0 3px rgba(58, 155, 105, 0.12);
+}
+
+button {
+  border: 0;
+  padding: 0 17px;
+  color: #fff;
+  background: #278354;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+button:hover {
+  background: #1e6d45;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.message {
+  min-height: 0;
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.message:not(:empty) {
+  margin-top: 14px;
+}
+
+.message.success {
+  color: #23764a;
+}
+
+.message.error {
+  color: #b43d38;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 13px 12px;
+  border-bottom: 1px solid #edf1ee;
+  white-space: nowrap;
+}
+
+th {
+  color: #78857d;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+td {
+  color: #35433a;
+  font-size: 0.9rem;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.number-cell {
+  text-align: right;
+}
+
+.stock-quantity {
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.badge.entrada {
+  color: #23764a;
+  background: #e8f5ed;
+}
+
+.badge.retirada {
+  color: #a45b22;
+  background: #fff2e4;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 18px 12px 6px;
+  color: #849087;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 850px) {
+  form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  form button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .container {
+    width: min(100% - 28px, 1040px);
+    padding-top: 32px;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .summary-card {
+    padding: 15px 18px;
+  }
+
+  .summary-card strong {
+    font-size: 1.5rem;
+  }
+
+  .panel {
+    padding: 19px 16px;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  form button {
+    grid-column: auto;
+  }
+}
